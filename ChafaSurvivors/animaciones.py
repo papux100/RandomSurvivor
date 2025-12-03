@@ -50,6 +50,10 @@ class ActorAnimado:
         """Dibuja el Actor en la superficie proporcionada"""
         self.actor.draw(surface)
     
+    def draw_con_offset(self, surface, offset_x=0, offset_y=0, centrado=False):
+        """Dibuja el Actor en la superficie proporcionada aplicando offset"""
+        self.actor.draw_con_offset(surface, offset_x, offset_y, centrado)
+
     # Métodos específicos de animación
     def get_animacion_actual(self):
         return self.animacion_actual

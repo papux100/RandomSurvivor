@@ -73,10 +73,40 @@ class Actor(pygame.sprite.Sprite):
         self.rect.center = (self.x, self.y)
         self.update_hitbox()  # Actualizar hitbox también
         surface.blit(self.image, self.rect)
+    
+    def draw_con_offset(self, surface, offset_x=0, offset_y=0, centrado=False):
+        """
+        Dibuja el actor aplicando un offset de cámara.
+        Si centrado=True, se dibuja en el centro de la pantalla (solo para el protagonista).
+        """
+        # Calcular la posición en la pantalla aplicando el offset
+        if centrado:
+            # Dibuja el actor en el centro de la pantalla, ignorando la posición del mundo.
+            screen_x = surface.get_width() // 2
+            screen_y = surface.get_height() // 2
+        else:
+            # Aplica el offset a la posición del mundo.
+            screen_x = self.x + offset_x
+            screen_y = self.y + offset_y
+        self.rect.center = (screen_x, screen_y)
+        # Actualiza la hitbox, ya que la posición del mundo (self.x, self.y) ha cambiado.
+        self.update_hitbox() 
+        surface.blit(self.image, self.rect)
 
-    def draw_hitbox(self, surface, color=(255, 0, 0)):
-        """Dibuja la hitbox para debugging"""
-        pygame.draw.rect(surface, color, self.hitbox, 2)  # Rectángulo rojo de 2px
+    def draw_hitbox(self, surface, color=(255, 0, 0), offset_x=0, offset_y=0, centrado=False):
+        """Dibuja la hitbox para debugging con offset"""
+        if centrado:
+            # Calcular dónde se debería dibujar la hitbox del protagonista en la pantalla
+            screen_x = surface.get_width() // 2 + self.hitbox_offset[0]
+            screen_y = surface.get_height() // 2 + self.hitbox_offset[1]
+        else:
+            # Calcular dónde se debería dibujar la hitbox de un objeto del mundo
+            screen_x = self.x + self.hitbox_offset[0] + offset_x
+            screen_y = self.y + self.hitbox_offset[1] + offset_y
+        # Crear un rectángulo para dibujar en la pantalla (la hitbox real NO se mueve)
+        hitbox_rect_pantalla = self.hitbox.copy()
+        hitbox_rect_pantalla.center = (screen_x, screen_y)
+        pygame.draw.rect(surface, color, hitbox_rect_pantalla, 2)
 
     def collides_with_point(self, point):
         return self.hitbox.collidepoint(point)
