@@ -291,26 +291,51 @@ class AuraSagrada(Poder):
         self.actualizar_estadisticas()
         
     def actualizar_estadisticas(self):
-        self.cura_por_segundo = 1 + (self.nivel * 0.5)
+        self.cura_por_segundo = (1 + (self.nivel * 0.5)) * 0
         self.daño_por_segundo = 2 + (self.nivel * 0.8)
         self.area = 120 + (self.nivel * 15)
-        self.cooldown = 1.0  # Actualización constante
+        self.cooldown = 0.1  # Cooldown muy corto para actualización constante
         
     def usar(self, jugador, enemigos, tiempo_actual):
-        # Si ya hay una aura activa, actualizarla y devolver lista vacía
-        if self.aura_activa and self.aura_activa.vivo:
+        # Siempre crear o actualizar la aura
+        
+        # Si ya hay una aura activa, actualizarla
+        if self.aura_activa and hasattr(self.aura_activa, 'vivo') and self.aura_activa.vivo:
             # Actualizar estadísticas de la aura existente
             self.aura_activa.cura_por_segundo = self.cura_por_segundo
             self.aura_activa.daño = self.daño_por_segundo
             self.aura_activa.area = self.area
+            # Mantener la referencia al jugador
+            if hasattr(self.aura_activa, 'jugador') and not self.aura_activa.jugador:
+                self.aura_activa.jugador = jugador
             return []  # No crear nueva aura
             
-        # Crear nueva aura si no existe
+        # Crear nueva aura si no existe o está muerta
         self.aura_activa = AuraSag(
             jugador.x, jugador.y, self.cura_por_segundo,
             self.daño_por_segundo, self.area
         )
+        # Pasar referencia al jugador inmediatamente
+        self.aura_activa.jugador = jugador
         return [self.aura_activa]
+    
+    # Añade un método para asegurar que la aura esté activa
+    def mantener_aura(self, jugador):
+        """Asegura que la aura esté activa y actualizada"""
+        if not self.aura_activa or not hasattr(self.aura_activa, 'vivo') or not self.aura_activa.vivo:
+            self.aura_activa = AuraSag(
+                jugador.x, jugador.y, self.cura_por_segundo,
+                self.daño_por_segundo, self.area
+            )
+            self.aura_activa.jugador = jugador
+        else:
+            # Actualizar estadísticas
+            self.aura_activa.cura_por_segundo = self.cura_por_segundo
+            self.aura_activa.daño = self.daño_por_segundo
+            self.aura_activa.area = self.area
+            self.aura_activa.jugador = jugador
+        
+        return self.aura_activa
 
 class LanzaHielo(Poder):
     def __init__(self, nivel=1):
@@ -554,19 +579,19 @@ class CampoMag(Efecto):
 class AuraSag(Efecto):
     def __init__(self, x, y, cura_por_segundo, daño_por_segundo, area):
         super().__init__(x, y, daño_por_segundo)
-        self.cura_por_segundo = cura_por_segundo
+        self.cura_por_segundo = 0 #no curamos nadota
         self.area = area
-        self.duracion_maxima = float('inf')  # Efecto permanente
+        self.duracion_maxima = float('inf')  # Ya está bien, pero asegurémonos
         self.tiempo_entre_efectos = 0.5
         self.tiempo_ultimo_efecto = 0
-        self.jugador = None  # Referencia al jugador
+        self.jugador = None
         
     def update(self, dt, jugador=None, enemigos=None):
         # Guardar referencia al jugador
         if jugador and not self.jugador:
             self.jugador = jugador
         
-        # Actualizar posición para seguir al jugador
+        # Actualizar posición para seguir al jugador (coordenadas del MUNDO)
         if self.jugador:
             self.x = self.jugador.x
             self.y = self.jugador.y
@@ -578,26 +603,22 @@ class AuraSag(Efecto):
             
             # Curar al jugador
             if jugador:
+                # Usar cura_por_segundo directamente (no multiplicado por tiempo_entre_efectos)
                 jugador.curar(self.cura_por_segundo * self.tiempo_entre_efectos)
             
             # Dañar enemigos cercanos
             if enemigos:
                 for enemigo in enemigos[:]:
+                    # Calcular distancia en coordenadas del MUNDO
                     distancia = math.hypot(self.x - enemigo.x, self.y - enemigo.y)
                     if distancia < self.area:
                         enemigo.recibir_daño(self.daño * self.tiempo_entre_efectos)
         
+        # Siempre retornar True para que nunca se elimine
         return True
     
     def draw(self, screen, offset_x=0, offset_y=0):
-        # Dibujar aura sagrada alrededor del jugador
-        # Optimización: dibujar menos capas y simplificar
-        
-        # Solo dibujar si está activo
-        if not self.vivo:
-            return
-            
-        # Calcular posición en pantalla (seguir al jugador)
+        # Calcular posición en pantalla (coordenadas del mundo + offset de cámara)
         screen_x = self.x + offset_x
         screen_y = self.y + offset_y
         
@@ -619,18 +640,6 @@ class AuraSag(Efecto):
         screen.blit(temp_surf, 
                    (int(screen_x - radio), 
                     int(screen_y - radio)))
-        
-        # Efecto de partículas opcional (reducido para optimizar)
-        import random
-        for _ in range(2):  # Solo 2 partículas en lugar de muchas
-            angle = random.random() * 2 * math.pi
-            particle_radius = random.randint(int(radio*0.8), int(radio))
-            px = screen_x + particle_radius * math.cos(angle)
-            py = screen_y + particle_radius * math.sin(angle)
-            
-            particle_surf = pygame.Surface((6, 6), pygame.SRCALPHA)
-            pygame.draw.circle(particle_surf, (255, 255, 200, 100), (3, 3), 3)
-            screen.blit(particle_surf, (int(px-3), int(py-3)))
 
 class LanzaHieloProyectil(Proyectil):
     def __init__(self, x, y, angulo, daño, velocidad, duracion_congelacion):
@@ -695,12 +704,29 @@ class PoderFactory:
         }
         
         if tipo in poderes:
-            return poderes[tipo](nivel)
+            try:
+                # Limitar el nivel máximo
+                nivel_maximo = 10  # Valor por defecto
+                if hasattr(poderes[tipo], 'max_nivel'):
+                    nivel_maximo = poderes[tipo].max_nivel
+                
+                nivel_ajustado = min(max(1, nivel), nivel_maximo)
+                return poderes[tipo](nivel_ajustado)
+            except Exception as e:
+                print(f"Error creando poder {tipo}: {e}")
+                # Crear un poder simple por defecto
+                return BolaDeFuego(1)
         return None
     
     @staticmethod
-    def crear_poder_aleatorio(nivel=1):
-        tipos = ["bola_fuego", "espadas", "rayo", "campo_magnetico", 
-                "esqueletos", "aura", "hielo"]
-        tipo = random.choice(tipos)
-        return PoderFactory.crear_poder(tipo, nivel)
+    def crear_poder_aleatorio(nivel_jugador=1):
+        try:
+            tipos = ["bola_fuego", "espadas", "rayo", "campo_magnetico", "aura", "hielo"]
+            
+            # Nivel simple: nivel del jugador dividido por 3, mínimo 1
+            nivel_poder = max(1, nivel_jugador // 3)
+            
+            return PoderFactory.crear_poder(tipos[random.randint(0,len(tipos)-1)], nivel_poder)
+        except Exception as e:
+            print(f"Error creando poder aleatorio: {e}")
+            return BolaDeFuego(1)

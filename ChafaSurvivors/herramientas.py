@@ -24,8 +24,8 @@ class Actor(pygame.sprite.Sprite):
             self.image = self.crear_placeholder()
             
         self.rect = self.image.get_rect(center=pos)
-        self.x = pos[0]
-        self.y = pos[1]
+        self.x = pos[0]  # Coordenadas del MUNDO
+        self.y = pos[1]  # Coordenadas del MUNDO
         
         # Hitbox por defecto (mismo tamaño que la imagen)
         self.hitbox = self.rect.copy()
@@ -77,42 +77,39 @@ class Actor(pygame.sprite.Sprite):
     def draw_con_offset(self, surface, offset_x=0, offset_y=0, centrado=False):
         """
         Dibuja el actor aplicando un offset de cámara.
-        Si centrado=True, se dibuja en el centro de la pantalla (solo para el protagonista).
+        Si centrado=False (para personajes y enemigos), se dibuja en su posición del mundo + offset.
         """
-        # Calcular la posición en la pantalla aplicando el offset
-        if centrado:
-            # Dibuja el actor en el centro de la pantalla, ignorando la posición del mundo.
-            screen_x = surface.get_width() // 2
-            screen_y = surface.get_height() // 2
-        else:
-            # Aplica el offset a la posición del mundo.
-            screen_x = self.x + offset_x
-            screen_y = self.y + offset_y
+        # Calcular la posición en la pantalla aplicando el offset de cámara
+        screen_x = self.x + offset_x
+        screen_y = self.y + offset_y
+        
+        # Actualizar rectángulo para dibujo
         self.rect.center = (screen_x, screen_y)
-        # Actualiza la hitbox, ya que la posición del mundo (self.x, self.y) ha cambiado.
-        self.update_hitbox() 
+        
+        # Dibujar en la superficie
         surface.blit(self.image, self.rect)
+        
+        # ACTUALIZAR LA HITBOX EN COORDENADAS DEL MUNDO (no de pantalla)
+        # Esto es crucial para que las colisiones funcionen
+        self.update_hitbox()
 
     def draw_hitbox(self, surface, color=(255, 0, 0), offset_x=0, offset_y=0, centrado=False):
-        """Dibuja la hitbox para debugging con offset"""
-        if centrado:
-            # Calcular dónde se debería dibujar la hitbox del protagonista en la pantalla
-            screen_x = surface.get_width() // 2 + self.hitbox_offset[0]
-            screen_y = surface.get_height() // 2 + self.hitbox_offset[1]
-        else:
-            # Calcular dónde se debería dibujar la hitbox de un objeto del mundo
-            screen_x = self.x + self.hitbox_offset[0] + offset_x
-            screen_y = self.y + self.hitbox_offset[1] + offset_y
-        # Crear un rectángulo para dibujar en la pantalla (la hitbox real NO se mueve)
+        """Dibuja la hitbox para debugging con offset de cámara"""
+        # Calcular posición de la hitbox en pantalla
+        screen_hitbox_x = self.x + self.hitbox_offset[0] + offset_x
+        screen_hitbox_y = self.y + self.hitbox_offset[1] + offset_y
+        
+        # Crear un rectángulo temporal para dibujar
         hitbox_rect_pantalla = self.hitbox.copy()
-        hitbox_rect_pantalla.center = (screen_x, screen_y)
+        hitbox_rect_pantalla.center = (screen_hitbox_x, screen_hitbox_y)
+        
         pygame.draw.rect(surface, color, hitbox_rect_pantalla, 2)
 
     def collides_with_point(self, point):
         return self.hitbox.collidepoint(point)
 
     def collides_with_actor(self, other_actor):
-        """Verifica colisión con otro Actor (usando hitboxes)"""
+        """Verifica colisión con otro Actor (usando hitboxes del MUNDO)"""
         return self.hitbox.colliderect(other_actor.hitbox)
 
     def collides_with_rect(self, rect):

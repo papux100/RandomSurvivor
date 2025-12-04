@@ -5,13 +5,9 @@ def manejar_colisiones(protagonista, enemigos):
     Maneja todas las colisiones del juego
     - Colisión entre protagonista y enemigos
     - Colisión entre enemigos
-    - Colisión con bordes de pantalla
     """
-    # Colisión con bordes de pantalla
-    manejar_colisiones_pantalla(protagonista)
-    
-    for enemigo in enemigos:
-        manejar_colisiones_pantalla(enemigo)
+    # NOTA: Eliminamos los límites de pantalla para permitir mundo infinito
+    # Los enemigos ahora pueden aparecer en cualquier lugar del mundo
     
     # Colisión entre protagonista y enemigos
     for enemigo in enemigos:
@@ -23,25 +19,6 @@ def manejar_colisiones(protagonista, enemigos):
         for j, enemigo2 in enumerate(enemigos):
             if i != j and enemigo1.actor_animado.actor.collides_with_actor(enemigo2.actor_animado.actor):
                 resolver_colision(enemigo1, enemigo2)
-
-def manejar_colisiones_pantalla(entidad):
-    """Maneja colisiones con los bordes de la pantalla"""
-    ancho_pantalla, alto_pantalla = 800, 600  # Ajusta según tu tamaño de pantalla
-    
-    # Margen para evitar que se salga completamente
-    margen = 5
-    
-    # Limitar movimiento horizontal
-    if entidad.x < margen:
-        entidad.x = margen
-    elif entidad.x > ancho_pantalla - margen:
-        entidad.x = ancho_pantalla - margen
-    
-    # Limitar movimiento vertical
-    if entidad.y < margen:
-        entidad.y = margen
-    elif entidad.y > alto_pantalla - margen:
-        entidad.y = alto_pantalla - margen
 
 def resolver_colision(entidad1, entidad2):
     """
@@ -58,10 +35,10 @@ def resolver_colision(entidad1, entidad2):
     separacion_x = dx / distancia
     separacion_y = dy / distancia
     
-    # Cantidad de separación (ajustable)
+    # Cantidad de separación
     fuerza_separacion = 2
     
-    # Aplicar separación
+    # Aplicar separación (en coordenadas del mundo)
     entidad1.x += separacion_x * fuerza_separacion
     entidad1.y += separacion_y * fuerza_separacion
     

@@ -1,0 +1,48 @@
+{
+    "Map/SizeTest": {
+        "height": 4300,
+        "width": 2
+    },
+    "activeFile": "Desierto.tmx",
+    "expandedProjectPaths": [
+    ],
+    "fileStates": {
+        "Desierto.tmx": {
+            "scale": 1.5,
+            "selectedLayer": 1,
+            "viewCenter": {
+                "x": 214.66666666666669,
+                "y": 259.33333333333326
+            }
+        },
+        "Objects.tsx": {
+            "scaleInDock": 1,
+            "scaleInEditor": 1
+        },
+        "water_coasts.tsx": {
+            "scaleInDock": 1,
+            "scaleInEditor": 1
+        }
+    },
+    "last.imagePath": "C:/Users/isidr/Downloads/Tilesets/craftpix-net-695666-free-undead-tileset-top-down-pixel-art(Infierno)/Tiled_files",
+    "map.height": 30,
+    "map.lastUsedFormat": "tmx",
+    "map.tileHeight": 16,
+    "map.tileWidth": 16,
+    "openFiles": [
+        "Desierto.tmx",
+        "water_coasts.tsx",
+        "Objects.tsx"
+    ],
+    "project": "Desierto.tiled-project",
+    "recentFiles": [
+        "Objects.tsx",
+        "water_coasts.tsx",
+        "Desierto.tmx"
+    ],
+    "tileset.lastUsedFormat": "tsx",
+    "tileset.tileSize": {
+        "height": 16,
+        "width": 16
+    }
+}

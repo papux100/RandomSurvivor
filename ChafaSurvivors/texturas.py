@@ -1,5 +1,6 @@
 import pygame
 import os
+import re
 
 # NO inicializar Pygame aquí, solo definir rutas
 RUTA_IMAGENES = os.path.join("ChafaSurvivors", "images")
@@ -174,8 +175,8 @@ def invertir_imagen(imagen):
     return imagen
 
 # Definir el tamaño deseado para las imágenes
-TAMAÑO_PERSONAJE = (320, 320)
-TAMAÑO_ENEMIGO = (320, 320)
+TAMAÑO_PERSONAJE = (60, 60)
+TAMAÑO_ENEMIGO = (60, 60)
 
 def obtener_texturas_jugador():
     """Obtiene y cachea las texturas del jugador"""
@@ -188,36 +189,36 @@ def obtener_texturas_jugador():
     try:
         texturas_personaje = {
             'quieto_derecha': [
-                cargar_imagen('idle1', TAMAÑO_PERSONAJE, usar_default=False),
-                cargar_imagen('idle2', TAMAÑO_PERSONAJE, usar_default=False), 
-                cargar_imagen('idle3', TAMAÑO_PERSONAJE, usar_default=False),
-                cargar_imagen('idle4', TAMAÑO_PERSONAJE, usar_default=False)
+                cargar_imagen('Caballero\idle\idle0.png', TAMAÑO_PERSONAJE, usar_default=False),
+                cargar_imagen('Caballero\idle\idle1.png', TAMAÑO_PERSONAJE, usar_default=False), 
+                cargar_imagen('Caballero\idle\idle0.png', TAMAÑO_PERSONAJE, usar_default=False),
+                cargar_imagen('Caballero\idle\idle1.png', TAMAÑO_PERSONAJE, usar_default=False) 
             ],
             'quieto_izquierda': [
-                invertir_imagen(cargar_imagen('idle1', TAMAÑO_PERSONAJE, usar_default=False)),
-                invertir_imagen(cargar_imagen('idle2', TAMAÑO_PERSONAJE, usar_default=False)), 
-                invertir_imagen(cargar_imagen('idle3', TAMAÑO_PERSONAJE, usar_default=False)),
-                invertir_imagen(cargar_imagen('idle4', TAMAÑO_PERSONAJE, usar_default=False))
+                invertir_imagen(cargar_imagen('Caballero\idle\idle0.png', TAMAÑO_PERSONAJE, usar_default=False)),
+                invertir_imagen(cargar_imagen('Caballero\idle\idle1.png', TAMAÑO_PERSONAJE, usar_default=False)), 
+                invertir_imagen(cargar_imagen('Caballero\idle\idle0.png', TAMAÑO_PERSONAJE, usar_default=False)),
+                invertir_imagen(cargar_imagen('Caballero\idle\idle1.png', TAMAÑO_PERSONAJE, usar_default=False)) 
             ],
             'caminar_derecha': [
-                cargar_imagen('mov1', TAMAÑO_PERSONAJE, usar_default=False),
-                cargar_imagen('mov2', TAMAÑO_PERSONAJE, usar_default=False),
-                cargar_imagen('mov3', TAMAÑO_PERSONAJE, usar_default=False),
-                cargar_imagen('mov4', TAMAÑO_PERSONAJE, usar_default=False),
-                cargar_imagen('mov5', TAMAÑO_PERSONAJE, usar_default=False),
-                cargar_imagen('mov6', TAMAÑO_PERSONAJE, usar_default=False),
-                cargar_imagen('mov7', TAMAÑO_PERSONAJE, usar_default=False),
-                cargar_imagen('mov8', TAMAÑO_PERSONAJE, usar_default=False)
+                cargar_imagen('Caballero\mov\mov0.png', TAMAÑO_PERSONAJE, usar_default=False),
+                cargar_imagen('Caballero\mov\mov1.png', TAMAÑO_PERSONAJE, usar_default=False),
+                cargar_imagen('Caballero\mov\mov2.png', TAMAÑO_PERSONAJE, usar_default=False),
+                cargar_imagen('Caballero\mov\mov3.png', TAMAÑO_PERSONAJE, usar_default=False),
+                cargar_imagen('Caballero\mov\mov4.png', TAMAÑO_PERSONAJE, usar_default=False),
+                cargar_imagen('Caballero\mov\mov5.png', TAMAÑO_PERSONAJE, usar_default=False),
+                cargar_imagen('Caballero\mov\mov6.png', TAMAÑO_PERSONAJE, usar_default=False),
+                cargar_imagen('Caballero\mov\mov7.png', TAMAÑO_PERSONAJE, usar_default=False)
             ],
             'caminar_izquierda': [
-                invertir_imagen(cargar_imagen('mov1', TAMAÑO_PERSONAJE, usar_default=False)),
-                invertir_imagen(cargar_imagen('mov2', TAMAÑO_PERSONAJE, usar_default=False)),
-                invertir_imagen(cargar_imagen('mov3', TAMAÑO_PERSONAJE, usar_default=False)),
-                invertir_imagen(cargar_imagen('mov4', TAMAÑO_PERSONAJE, usar_default=False)),
-                invertir_imagen(cargar_imagen('mov5', TAMAÑO_PERSONAJE, usar_default=False)),
-                invertir_imagen(cargar_imagen('mov6', TAMAÑO_PERSONAJE, usar_default=False)),
-                invertir_imagen(cargar_imagen('mov7', TAMAÑO_PERSONAJE, usar_default=False)),
-                invertir_imagen(cargar_imagen('mov8', TAMAÑO_PERSONAJE, usar_default=False))
+                invertir_imagen(cargar_imagen('Caballero\mov\mov0.png', TAMAÑO_PERSONAJE, usar_default=False)),
+                invertir_imagen(cargar_imagen('Caballero\mov\mov1.png', TAMAÑO_PERSONAJE, usar_default=False)),
+                invertir_imagen(cargar_imagen('Caballero\mov\mov2.png', TAMAÑO_PERSONAJE, usar_default=False)),
+                invertir_imagen(cargar_imagen('Caballero\mov\mov3.png', TAMAÑO_PERSONAJE, usar_default=False)),
+                invertir_imagen(cargar_imagen('Caballero\mov\mov4.png', TAMAÑO_PERSONAJE, usar_default=False)),
+                invertir_imagen(cargar_imagen('Caballero\mov\mov5.png', TAMAÑO_PERSONAJE, usar_default=False)),
+                invertir_imagen(cargar_imagen('Caballero\mov\mov6.png', TAMAÑO_PERSONAJE, usar_default=False)),
+                invertir_imagen(cargar_imagen('Caballero\mov\mov7.png', TAMAÑO_PERSONAJE, usar_default=False))
             ],
         }
         
@@ -246,6 +247,137 @@ def obtener_texturas_jugador():
     
     return _texturas_jugador_cache
 
+def obtener_texturas_enemigo(tipo_enemigo):
+    """Obtiene las texturas para un tipo específico de enemigo desde carpetas"""
+    
+    # Mapeo de nombres de carpetas
+    carpetas_enemigos = {
+        "zombie": "Zombi",
+        "esqueleto": "Esqueleto",
+        "brujo": "Mago",
+        "momia": "Momia",
+        "escorpion": "Escorpion",
+        "gusano": "Gusano",
+        "templario": "Vampiro",
+        "angel_oscuro": "AngelOscuro",
+        "sacerdote": "Sacerdote",
+    }
+    
+    # Obtener nombre de carpeta
+    nombre_carpeta = carpetas_enemigos.get(tipo_enemigo.lower())
+    if not nombre_carpeta:
+        print(f"Tipo de enemigo '{tipo_enemigo}' no reconocido. Usando texturas por defecto.")
+        return obtener_texturas_jugador()  # Fallback a texturas del jugador
+    
+    texturas_enemigo = {
+        'quieto_derecha': [],
+        'quieto_izquierda': [],
+        'caminar_derecha': [],
+        'caminar_izquierda': []
+    }
+    
+    try:
+        # Cargar animación idle (quieto)
+        ruta_idle = os.path.join(RUTA_IMAGENES, nombre_carpeta, "idle")
+        if os.path.exists(ruta_idle):
+            archivos_idle = sorted([f for f in os.listdir(ruta_idle) 
+                                  if f.lower().endswith(('.png', '.jpg', '.jpeg'))])
+            
+            for archivo in archivos_idle:
+                # Construir ruta relativa para cargar_imagen
+                ruta_relativa = os.path.join(nombre_carpeta, "idle", archivo)
+                try:
+                    # Usar cargar_imagen que ya maneja tamaño y errores
+                    imagen = cargar_imagen(ruta_relativa, TAMAÑO_ENEMIGO, usar_default=False)
+                    texturas_enemigo['quieto_derecha'].append(imagen)
+                    texturas_enemigo['quieto_izquierda'].append(invertir_imagen(imagen))
+                except Exception as e:
+                    print(f"Error cargando {ruta_relativa}: {e}")
+                    # Crear placeholder si falla
+                    placeholder = crear_superficie_placeholder(f"{tipo_enemigo}_idle", TAMAÑO_ENEMIGO)
+                    texturas_enemigo['quieto_derecha'].append(placeholder)
+                    texturas_enemigo['quieto_izquierda'].append(invertir_imagen(placeholder))
+        else:
+            print(f"Advertencia: No se encontró carpeta 'idle' en {os.path.join(RUTA_IMAGENES, nombre_carpeta)}")
+            # Crear frames por defecto
+            for i in range(4):
+                placeholder = crear_superficie_placeholder(f"{tipo_enemigo}_idle_{i}", TAMAÑO_ENEMIGO)
+                texturas_enemigo['quieto_derecha'].append(placeholder)
+                texturas_enemigo['quieto_izquierda'].append(invertir_imagen(placeholder))
+        
+        # Cargar animación mov (caminar)
+        ruta_mov = os.path.join(RUTA_IMAGENES, nombre_carpeta, "mov")
+        if os.path.exists(ruta_mov):
+            archivos_mov = sorted([f for f in os.listdir(ruta_mov) 
+                                 if f.lower().endswith(('.png', '.jpg', '.jpeg'))])
+            
+            for archivo in archivos_mov:
+                # Construir ruta relativa para cargar_imagen
+                ruta_relativa = os.path.join(nombre_carpeta, "mov", archivo)
+                try:
+                    # Usar cargar_imagen que ya maneja tamaño y errores
+                    imagen = cargar_imagen(ruta_relativa, TAMAÑO_ENEMIGO, usar_default=False)
+                    texturas_enemigo['caminar_derecha'].append(imagen)
+                    texturas_enemigo['caminar_izquierda'].append(invertir_imagen(imagen))
+                except Exception as e:
+                    print(f"Error cargando {ruta_relativa}: {e}")
+                    # Crear placeholder si falla
+                    placeholder = crear_superficie_placeholder(f"{tipo_enemigo}_mov", TAMAÑO_ENEMIGO)
+                    texturas_enemigo['caminar_derecha'].append(placeholder)
+                    texturas_enemigo['caminar_izquierda'].append(invertir_imagen(placeholder))
+        else:
+            print(f"Advertencia: No se encontró carpeta 'mov' en {os.path.join(RUTA_IMAGENES, nombre_carpeta)}")
+            # Crear frames por defecto
+            for i in range(8):
+                placeholder = crear_superficie_placeholder(f"{tipo_enemigo}_mov_{i}", TAMAÑO_ENEMIGO)
+                texturas_enemigo['caminar_derecha'].append(placeholder)
+                texturas_enemigo['caminar_izquierda'].append(invertir_imagen(placeholder))
+        
+        # Verificar que tenemos al menos un frame en cada animación
+        for animacion in texturas_enemigo:
+            if len(texturas_enemigo[animacion]) == 0:
+                print(f"Advertencia: Animación {animacion} vacía para {tipo_enemigo}")
+                placeholder = crear_superficie_placeholder(f"{tipo_enemigo}_{animacion}", TAMAÑO_ENEMIGO)
+                texturas_enemigo[animacion].append(placeholder)
+        
+        print(f"Texturas de {tipo_enemigo} cargadas correctamente desde carpetas")
+        return texturas_enemigo
+        
+    except Exception as e:
+        print(f"Error cargando texturas para {tipo_enemigo}: {e}")
+        print("Usando texturas del jugador como fallback")
+        return obtener_texturas_jugador()
+    
+def cargar_imagen_desde_ruta(ruta_completa, tamaño=None, usar_default=True):
+    """Carga una imagen desde una ruta completa"""
+    try:
+        if not os.path.exists(ruta_completa):
+            if usar_default:
+                return crear_superficie_placeholder(os.path.basename(ruta_completa), tamaño)
+            else:
+                raise FileNotFoundError(f"Archivo no encontrado: {ruta_completa}")
+        
+        imagen = pygame.image.load(ruta_completa)
+        
+        # Redimensionar si se especifica un tamaño
+        if tamaño:
+            imagen = pygame.transform.scale(imagen, tamaño)
+        
+        # Optimizar la imagen
+        if imagen.get_alpha():
+            imagen = imagen.convert_alpha()
+        else:
+            imagen = imagen.convert()
+            
+        return imagen
+    except pygame.error as e:
+        print(f"No se pudo cargar la imagen: {ruta_completa}")
+        print(f"Error: {e}")
+        if usar_default:
+            return crear_superficie_placeholder(os.path.basename(ruta_completa), tamaño)
+        else:
+            raise
+
 def inicializar_texturas():
     """Inicializa las texturas después de que Pygame esté inicializado"""
     # Simplemente devolver las texturas del jugador
@@ -253,7 +385,16 @@ def inicializar_texturas():
 
 def obtener_textura_enemigo(tipo_enemigo):
     """Obtiene las texturas para un tipo específico de enemigo como diccionario de LISTAS"""
-    # Primero obtener las texturas base del jugador
+    
+    # Primero intentar cargar desde carpetas específicas
+    texturas_cargadas = obtener_texturas_enemigo(tipo_enemigo)
+    
+    # Si se cargaron correctamente desde carpetas, devolverlas
+    if texturas_cargadas and len(texturas_cargadas['quieto_derecha']) > 0:
+        return texturas_cargadas
+    
+    # Fallback: usar el método antiguo (texturas del jugador con filtro de color)
+    print(f"Usando fallback para {tipo_enemigo}...")
     texturas_base = obtener_texturas_jugador()
     
     # Crear un diccionario con texturas del jugador modificadas para el enemigo
@@ -274,3 +415,52 @@ def obtener_textura_enemigo(tipo_enemigo):
         textura_correcta[key] = frames_modificados
     
     return textura_correcta
+
+
+def obtener_archivos_animacion(ruta_carpeta):
+    """Obtiene los archivos de animación ordenados de una carpeta"""
+    if not os.path.exists(ruta_carpeta):
+        return []
+    
+    archivos = []
+    for archivo in os.listdir(ruta_carpeta):
+        if archivo.lower().endswith(('.png', '.jpg', '.jpeg', '.bmp')):
+            archivos.append(archivo)
+    
+    # Ordenar naturalmente (para que frame1, frame2, frame10 se ordenen correctamente)
+    archivos.sort(key=lambda x: [int(c) if c.isdigit() else c for c in re.split(r'(\d+)', x)])
+    return archivos
+
+def crear_animacion_desde_secuencia(tipo_enemigo, nombre_animacion, cantidad_frames, tamaño=None):
+    """Crea una animación desde una secuencia de frames numerados"""
+    if tamaño is None:
+        tamaño = TAMAÑO_ENEMIGO
+    
+    frames = []
+    for i in range(1, cantidad_frames + 1):
+        # Intentar diferentes formatos de nombres
+        posibles_nombres = [
+            f"{nombre_animacion}{i}.png",
+            f"{nombre_animacion}_{i}.png",
+            f"frame{i}.png",
+            f"{i}.png"
+        ]
+        
+        frame_cargado = False
+        for nombre_archivo in posibles_nombres:
+            ruta_completa = os.path.join(RUTA_IMAGENES, tipo_enemigo, nombre_animacion, nombre_archivo)
+            if os.path.exists(ruta_completa):
+                try:
+                    imagen = cargar_imagen_desde_ruta(ruta_completa, tamaño, usar_default=False)
+                    frames.append(imagen)
+                    frame_cargado = True
+                    break
+                except:
+                    continue
+        
+        # Si no se pudo cargar, crear placeholder
+        if not frame_cargado:
+            placeholder = crear_superficie_placeholder(f"{tipo_enemigo}_{nombre_animacion}_{i}", tamaño)
+            frames.append(placeholder)
+    
+    return frames
