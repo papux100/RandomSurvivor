@@ -133,7 +133,7 @@ class BolaDeFuego(Poder):
         self.actualizar_estadisticas()
         
     def actualizar_estadisticas(self):
-        self.daño = 5 + (self.nivel * 2) + (self.stacks * 1.5)
+        self.daño = 20 + (self.nivel * 2) + (self.stacks * 1.5)
         self.velocidad = 3 + (self.nivel * 0.2)
         self.cooldown = max(0.3, self.cooldown_base - (self.nivel * 0.1))
         self.rango = 300 + (self.nivel * 20)
@@ -181,7 +181,7 @@ class EspadasVoladoras(Poder):
         self.actualizar_estadisticas()
         
     def actualizar_estadisticas(self):
-        self.daño = 3 + (self.nivel * 1.5)
+        self.daño = 20 + (self.nivel * 1.5)
         self.velocidad_angular = 0.001 + (self.nivel * 0.1)
         self.radio_orbitante = 80 + (self.nivel * 5)
         self.num_espadas = 1 + (self.nivel // 2)
@@ -216,7 +216,7 @@ class RayoElectrico(Poder):
         self.actualizar_estadisticas()
         
     def actualizar_estadisticas(self):
-        self.daño = 8 + (self.nivel * 3)
+        self.daño = 16 + (self.nivel * 3)
         self.rango = 200 + (self.nivel * 30)
         self.area = 20 + (self.nivel * 5)
         self.cooldown = max(0.5, self.cooldown_base - (self.nivel * 0.2))
@@ -265,7 +265,7 @@ class CampoMagnetico(Poder):
         self.actualizar_estadisticas()
         
     def actualizar_estadisticas(self):
-        self.daño_por_segundo = 1 + (self.nivel * 0.5)
+        self.daño_por_segundo = 5 + (self.nivel * 0.5)
         self.area = 150 + (self.nivel * 20)
         self.fuerza_atraccion = 0.5 + (self.nivel * 0.1)
         self.cooldown = max(3.0, self.cooldown_base - (self.nivel * 1.0))
@@ -292,7 +292,7 @@ class AuraSagrada(Poder):
         
     def actualizar_estadisticas(self):
         self.cura_por_segundo = (1 + (self.nivel * 0.5)) * 0
-        self.daño_por_segundo = 2 + (self.nivel * 0.8)
+        self.daño_por_segundo = 10 + (self.nivel * 0.8)
         self.area = 120 + (self.nivel * 15)
         self.cooldown = 0.1  # Cooldown muy corto para actualización constante
         
@@ -347,7 +347,7 @@ class LanzaHielo(Poder):
         self.actualizar_estadisticas()
         
     def actualizar_estadisticas(self):
-        self.daño = 6 + (self.nivel * 2)
+        self.daño = 12 + (self.nivel * 2)
         self.velocidad = 2.5 + (self.nivel * 0.15)
         self.duracion_congelacion = 1 + (self.nivel * 0.3)
         self.cooldown = max(0.5, self.cooldown_base - (self.nivel * 0.1))

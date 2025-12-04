@@ -18,7 +18,7 @@ def dibujar_cajas():
 
 def menu():
     screen_width, screen_height = Variables_Globales["RESOLUTION"]
-    
+
     # Dibujar fondo si existe
     if declaraciones["background"]:
         declaraciones["screen"].blit(declaraciones["background"], (0, 0))

@@ -18,6 +18,7 @@ from fondo_mosaico import FondoMosaico
 
 # Inicializar Pygame PRIMERO
 pygame.init()
+pygame.mixer.init()
 inicializacion_menu()
 
 # Obtener dimensiones de pantalla desde variables globales
@@ -146,6 +147,7 @@ def inicializar_juego():
     
     # Establecer mundo inicial
     Variables_Globales["MUNDO_ACTUAL"] = "bosque"
+    cambiar_musica(Variables_Globales["MUNDO_ACTUAL"])
     Variables_Globales["MUNDO_ANTERIOR"] = None
     Variables_Globales["EN_ENDLESS"] = False
     Variables_Globales["PARTIDA_COMPLETADA"] = False
@@ -180,16 +182,17 @@ def generar_enemigos_mundo_actual():
     
     # Tipos de enemigos permitidos en este mundo
     tipos_permitidos = ENEMIGOS_POR_MUNDO[mundo]
-    
+
     for _ in range(total_enemies):
         # Solo generar si hay tipos permitidos
         if tipos_permitidos:
             tipo = random.choice(tipos_permitidos)
             enemigo = generar_enemigo_tipo(tipo)
             
-            if enemigo:
-                enemigos.append(enemigo)
-                enemigos_por_mundo[mundo] += 1
+            if enemigos_por_mundo[mundo] <= 200:
+                if enemigo:
+                    enemigos.append(enemigo)
+                    enemigos_por_mundo[mundo] += 1
 
 def generar_enemigo_tipo(tipo):
     """Genera un enemigo de un tipo específico alrededor del jugador"""
@@ -343,7 +346,7 @@ def cambiar_mundo(nuevo_mundo):
     
     # Actualizar mundo actual
     Variables_Globales["MUNDO_ACTUAL"] = nuevo_mundo
-    
+    cambiar_musica(nuevo_mundo)
     # Actualizar fondo mosaico
     if fondo_mosaico:
         fondo_mosaico.cambiar_mundo(nuevo_mundo)
@@ -574,7 +577,7 @@ def actualizar_juego():
         # Generar enemigos (también aumentar cantidad según nivel)
         cantidad_base = 1
         cantidad_extra = nivel_jugador // 5  # 1 extra cada 5 niveles
-        cantidad = cantidad_base + cantidad_extra
+        cantidad = (cantidad_base + cantidad_extra) % 200
         
         for _ in range(cantidad):
             nuevo_enemigo = generar_enemigo_alrededor()
@@ -972,6 +975,8 @@ def volver_al_menu():
     en_juego = False
     
     # Restablecer estados del menú
+    cambiar_musica("Menu")
+
     estado_bloques["rect1"] = True
     estado_bloques["rect2"] = True
     estado_bloques["rect3"] = True
@@ -1063,6 +1068,7 @@ while running:
                 if event.key == pygame.K_ESCAPE:
                     # Pausar/volver al menú
                     en_juego = False
+                    cambiar_musica("Menu")   
                     estado_bloques["rect1"] = True
                     estado_bloques["rect2"] = True
                     estado_bloques["rect3"] = True
@@ -1109,7 +1115,11 @@ while running:
                 if Variables_Globales["STARTGAME"] and not en_juego:
                     en_juego = True
                     inicializar_juego()
-        
+                    
+        if not unavez:
+            cambiar_musica("Menu")
+            unavez = True
+
         menu()
     
     pygame.display.flip()

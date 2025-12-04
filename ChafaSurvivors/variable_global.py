@@ -20,7 +20,7 @@ COLORES_MUNDOS = {
 
 # Tamaño de mosaico para fondos (se puede ajustar)
 TAMAÑO_MOSAICO = 1500  # Tamaño base de cada mosaico, ajustable
-
+MAX_ENEMIGOS = 40
 # Rutas de fondos por mundo
 RUTAS_FONDOS = {
     "bosque": os.path.join("ChafaSurvivors", "images", "Bosque", "Bosque.png"),
@@ -115,6 +115,46 @@ REQUISITOS_MUNDO = {
     "desierto": {"nivel": 40, "mundo_siguiente": "catedral"},
     "catedral": {"nivel": 60, "mundo_siguiente": "endless"}
 }
+MUSICA_MUNDO = {
+    "Menu": "ChafaSurvivors\sounds\Menu.mp3",
+    "bosque": "ChafaSurvivors\sounds\Bosque.mp3",
+    "desierto": "ChafaSurvivors\sounds\Desierto.mp3",
+    "catedral": "ChafaSurvivors\sounds\Catedral.mp3"
+}
+musica_actual = None
+unavez = False
+
+def cambiar_musica(tipo):
+    """Carga y reproduce música sólo si no está ya sonando.
+    Busca la clave en MUSICA_MUNDO ignorando mayúsculas/minúsculas.
+    """
+    global musica_actual
+
+    # buscar clave en MUSICA_MUNDO de forma case-insensitive
+    clave = None
+    for k in MUSICA_MUNDO.keys():
+        if k.lower() == str(tipo).lower():
+            clave = k
+            break
+    if not clave:
+        # key no encontrada
+        print(f"[audio] Mundo '{tipo}' no corresponde a ninguna pista.")
+        return
+
+    # si ya suena, no hacer nada
+    if musica_actual == clave:
+        return
+
+    try:
+        pygame.mixer.music.load(MUSICA_MUNDO[clave])
+        pygame.mixer.music.play(-1)
+        musica_actual = clave
+        # opcional: ajustar volumen por defecto
+        pygame.mixer.music.set_volume(0.5)
+        print(f"[audio] Reproduciendo: {clave}")
+    except Exception as e:
+        print(f"[audio] Error al cargar {MUSICA_MUNDO[clave]}: {e}")
+       
 
 def actualizar_tamanos_bloques():
     """Actualiza los tamaños de los bloques según la resolución actual"""
@@ -150,6 +190,7 @@ def inicializacion_menu():
     
     # Actualizar tamaños de bloques
     actualizar_tamanos_bloques()
+
     
     # Cargar fondo.png si existe
     try:
