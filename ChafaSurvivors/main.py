@@ -613,6 +613,24 @@ def dibujar_enemigo_con_color(enemigo, screen):
     """Dibuja un enemigo con su textura y color identificador"""
     enemigo.draw_con_offset(screen, camera_offset_x, camera_offset_y)
     
+    if hasattr(enemigo, 'tipo') and enemigo.tipo in COLORES_ENEMIGOS:
+        color = COLORES_ENEMIGOS[enemigo.tipo]
+        
+        circle_size = int(12 * (WIDTH / 1280))
+        screen_x = enemigo.x + camera_offset_x
+        screen_y = enemigo.y + camera_offset_y
+        
+        if hasattr(enemigo, 'vida_max') and hasattr(enemigo, 'vida'):
+            vida_porcentaje = enemigo.vida / enemigo.vida_max
+            vida_ancho = int(40 * (WIDTH / 1280))
+            vida_x = screen_x - vida_ancho // 2
+            vida_y = screen_y - 60
+            
+            pygame.draw.rect(screen, (50, 50, 50), 
+                            (vida_x, vida_y, vida_ancho, int(5 * (WIDTH / 1280))))
+            pygame.draw.rect(screen, color, 
+                            (vida_x, vida_y, int(vida_ancho * vida_porcentaje), int(5 * (WIDTH / 1280))))
+    
             
 
 def dibujar_juego():

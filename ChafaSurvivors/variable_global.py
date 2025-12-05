@@ -3,7 +3,8 @@ import pygame, sys
 import os
 
 # Dimensiones por defecto
-WINDOWED_RESOLUTION = (1280, 720)
+WINDOWED_RESOLUTION = (1600, 1000)
+#WINDOWED_RESOLUTION = (1280, 720)
 FULLSCREEN_RESOLUTION = (1920, 1200)
 
 # Declaracion de colores para el menu
